@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flask Backend Demo - Standalone</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            padding: 40px;
+            max-width: 600px;
+            width: 90%;
+            text-align: center;
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 2.5rem;
+            font-weight: 300;
+        }
+
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 1.1rem;
+        }
+
+        .button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1rem;
+            margin: 10px;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .response {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            text-align: left;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .response h3 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .response pre {
+            background: #e9ecef;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+            font-size: 0.9rem;
+        }
+
+        .loading {
+            color: #666;
+            font-style: italic;
+        }
+
+        .error {
+            color: #dc3545;
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+
+        .success {
+            color: #155724;
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+
+        .demo-notice {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            color: #856404;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        .demo-notice h4 {
+            margin-bottom: 10px;
+            color: #856404;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🚀 Flask Backend Demo</h1>
+        <p class="subtitle">Standalone HTML Version - No Server Required</p>
+        
+        <div class="demo-notice">
+            <h4>⚠️ Demo-Mode</h4>
+            <p>This is a standalone HTML version that simulates API responses. In a real Flask application, these would connect to actual backend endpoints.</p>
+        </div>
+        
+        <div>
+            <button class="button" onclick="testHelloAPI()">Test Hello API</button>
+            <button class="button" onclick="testDataAPI()">Test Data API</button>
+            <button class="button" onclick="clearResponses()">Clear Responses</button>
+        </div>
+
+        <div id="responses"></div>
+    </div>
+
+    <script>
+        // JavaScript for Flask Backend Demo (Standalone Version)
+
+        // Function to add a response to the UI
+        function addResponse(title, content, type = 'success') {
+            const responsesDiv = document.getElementById('responses');
+            const responseDiv = document.createElement('div');
+            responseDiv.className = `response ${type}`;
+            
+            const timestamp = new Date().toLocaleTimeString();
+            
+            responseDiv.innerHTML = `
+                <h3>${title} <small style="color: #666;">(${timestamp})</small></h3>
+                <pre>${JSON.stringify(content, null, 2)}</pre>
+            `;
+            
+            responsesDiv.appendChild(responseDiv);
+            responseDiv.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // Function to show loading state
+        function showLoading(message) {
+            const responsesDiv = document.getElementById('responses');
+            const loadingDiv = document.createElement('div');
+            loadingDiv.className = 'response loading';
+            loadingDiv.id = 'loading';
+            loadingDiv.innerHTML = `<h3>${message}</h3>`;
+            responsesDiv.appendChild(loadingDiv);
+        }
+
+        // Function to remove loading state
+        function removeLoading() {
+            const loadingDiv = document.getElementById('loading');
+            if (loadingDiv) {
+                loadingDiv.remove();
+            }
+        }
+
+        // Simulate API delay
+        function simulateAPICall(delay = 1000) {
+            return new Promise(resolve => setTimeout(resolve, delay));
+        }
+
+        // Test the Hello API endpoint (simulated)
+        async function testHelloAPI() {
+            showLoading('Calling Hello API...');
+            
+            try {
+                // Simulate API call delay
+                await simulateAPICall(800);
+                
+                // Simulate the response that would come from Flask
+                const data = {
+                    message: "Hello from Flask backend!",
+                    timestamp: new Date().toISOString(),
+                    status: "success"
+                };
+                
+                removeLoading();
+                addResponse('Hello API Response (Simulated)', data);
+            } catch (error) {
+                removeLoading();
+                addResponse('Hello API Error', {
+                    error: error.message,
+                    status: 'Failed'
+                }, 'error');
+            }
+        }
+
+        // Test the Data API endpoint (simulated)
+        async function testDataAPI() {
+            showLoading('Calling Data API...');
+            
+            try {
+                // Simulate API call delay
+                await simulateAPICall(1200);
+                
+                // Simulate the response that would come from Flask
+                const data = {
+                    items: [
+                        {id: 1, name: "Item 1", description: "First item", created: "2024-01-15"},
+                        {id: 2, name: "Item 2", description: "Second item", created: "2024-01-16"},
+                        {id: 3, name: "Item 3", description: "Third item", created: "2024-01-17"},
+                        {id: 4, name: "Item 4", description: "Fourth item", created: "2024-01-18"}
+                    ],
+                    total: 4,
+                    timestamp: new Date().toISOString(),
+                    status: "success"
+                };
+                
+                removeLoading();
+                addResponse('Data API Response (Simulated)', data);
+            } catch (error) {
+                removeLoading();
+                addResponse('Data API Error', {
+                    error: error.message,
+                    status: 'Failed'
+                }, 'error');
+            }
+        }
+
+        // Clear all responses
+        function clearResponses() {
+            const responsesDiv = document.getElementById('responses');
+            responsesDiv.innerHTML = '';
+        }
+
+        // Add some interactive features
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Flask Backend Demo (Standalone) loaded successfully!');
+            
+            // Add keyboard shortcuts
+            document.addEventListener('keydown', function(event) {
+                // Ctrl/Cmd + 1 for Hello API
+                if ((event.ctrlKey || event.metaKey) && event.key === '1') {
+                    event.preventDefault();
+                    testHelloAPI();
+                }
+                // Ctrl/Cmd + 2 for Data API
+                if ((event.ctrlKey || event.metaKey) && event.key === '2') {
+                    event.preventDefault();
+                    testDataAPI();
+                }
+                // Ctrl/Cmd + C to clear responses
+                if ((event.ctrlKey || event.metaKey) && event.key === 'c') {
+                    event.preventDefault();
+                    clearResponses();
+                }
+            });
+            
+            // Add welcome message
+            addResponse('Welcome! (Standalone Version)', {
+                message: 'Flask Backend Demo is ready!',
+                note: 'This is a standalone HTML version that simulates API responses',
+                instructions: 'Click the buttons above to test the simulated API endpoints',
+                shortcuts: {
+                    'Ctrl/Cmd + 1': 'Test Hello API',
+                    'Ctrl/Cmd + 2': 'Test Data API', 
+                    'Ctrl/Cmd + C': 'Clear Responses'
+                },
+                next_steps: 'To run with real Flask backend, install Python and run app.py'
+            });
+        });
+    </script>
+</body>
+</html> 

@@ -1,28 +1,18 @@
-from flask import Flask, render_template, jsonify
-import os
+from fastapi import FastAPI, Request
+from fastapi.responses import HTMLResponse
+from fastapi.staticfiles import StaticFiles
+from fastapi.templating import Jinja2Templates
+import uvicorn
 
-app = Flask(__name__)
+app = FastAPI()
 
-@app.route('/')
-def index():
-    """Serve the main HTML page"""
-    return render_template('index.html')
+app.mount("/static", StaticFiles(directory="static"), name="static")
 
-@app.route('/api/hello')
-def hello():
-    """Simple API endpoint"""
-    return jsonify({'message': 'Hello from Flask backend!'})
+templates = Jinja2Templates(directory="templates")
 
-@app.route('/api/data')
-def get_data():
-    """API endpoint that returns some sample data"""
-    return jsonify({
-        'items': [
-            {'id': 1, 'name': 'Item 1', 'description': 'First item'},
-            {'id': 2, 'name': 'Item 2', 'description': 'Second item'},
-            {'id': 3, 'name': 'Item 3', 'description': 'Third item'}
-        ]
-    })
+@app.get("/", response_class=HTMLResponse)
+async def read_index(request: Request):
+    return templates.TemplateResponse("index.html", {"request": request})
 
-if __name__ == '__main__':
-    app.run(debug=True, host='0.0.0.0', port=5000) 
+if __name__ == "__main__":
+    uvicorn.run(app, host="0.0.0.0", port=8000)
